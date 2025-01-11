@@ -3,7 +3,6 @@ package com.bolun.hotel.validation;
 import com.bolun.hotel.dto.UserCreateEditDto;
 import com.bolun.hotel.dto.UserDetailReadDto;
 import com.bolun.hotel.dto.UserReadDto;
-import com.bolun.hotel.entity.User;
 import com.bolun.hotel.service.UserDetailService;
 import com.bolun.hotel.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class UserValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return User.class.equals(clazz);
+        return UserCreateEditDto.class.equals(clazz);
     }
 
     @Override

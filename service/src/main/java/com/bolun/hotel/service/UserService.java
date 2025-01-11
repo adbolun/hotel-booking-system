@@ -6,6 +6,8 @@ import com.bolun.hotel.dto.UserReadDto;
 import com.bolun.hotel.dto.filters.UserFilter;
 import com.bolun.hotel.entity.User;
 import com.bolun.hotel.entity.UserDetail;
+import com.bolun.hotel.exception.PasswordNotMatchException;
+import com.bolun.hotel.exception.UserNotFoundException;
 import com.bolun.hotel.mapper.Mapper;
 import com.bolun.hotel.mapper.UserCreateEditMapper;
 import com.bolun.hotel.mapper.UserReadMapper;
@@ -28,10 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.bolun.hotel.service.PasswordChangeResult.INVALID_PASSWORD;
-import static com.bolun.hotel.service.PasswordChangeResult.NOT_FOUND;
-import static com.bolun.hotel.service.PasswordChangeResult.SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -126,17 +124,15 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public PasswordChangeResult changePassword(UUID id, ChangePasswordDto dto) {
-        return userRepository.findActiveByIdWithLock(id)
-                .map(user -> {
-                    if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
-                        return INVALID_PASSWORD;
-                    }
+    public void changePassword(UUID id, ChangePasswordDto dto) {
+        User user = userRepository.findActiveByIdWithLock(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-                    user.setPassword(passwordEncoder.encode(dto.newPassword()));
-                    return SUCCESS;
-                })
-                .orElse(NOT_FOUND);
+        if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+            throw new PasswordNotMatchException("Passwords not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
     }
 
     @Transactional

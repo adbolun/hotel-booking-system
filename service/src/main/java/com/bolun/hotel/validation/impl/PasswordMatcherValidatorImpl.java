@@ -27,7 +27,7 @@ public class PasswordMatcherValidatorImpl implements ConstraintValidator<Passwor
         boolean passwordsMatch = user.getPassword().equals(user.getConfirmPassword());
         if (!passwordsMatch) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Passwords do not match")
+            context.buildConstraintViolationWithTemplate("Passwords not match")
                     .addPropertyNode(confirmPasswordField)
                     .addConstraintViolation();
         }
